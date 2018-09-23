@@ -1,0 +1,49 @@
+<html>
+<head>
+<title>Mock API</title>
+</head>
+<body>
+<div id="root">Loading API</div>
+<table id="restauranttable">
+  <thead>
+    <tr>
+      <td><strong>Name</strong></td>
+    </tr>
+  <thead>
+  <tbody>
+  </tbody>
+</table>
+<template id="restaurantrow">
+  <tr>
+    <td></td>
+  </tr>
+</template>
+</body>
+<script>
+fetch('https://mockapi.pizza.de/v1/auth').then((data) => {
+  return data.json();
+}).then(json => {
+  return json.token;
+}).catch(err => {
+  alert(err.message);
+}).then(token => {
+  return fetch('https://mockapi.pizza.de/v1/restaurants', { headers: {token }});
+}).then(data => {
+  return data.json();
+}).then(body => {
+  return body.data;
+}).then(restaurants => {
+  // Stolen from https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template
+  const t = document.querySelector("#restaurantrow");
+  const tb = document.querySelector("tbody");
+  restaurants.forEach(restaurant => {
+    const clone = document.importNode(t.content, true)
+    const td = clone.querySelectorAll("td");
+    td[0].textContent = restaurant.general.name;
+    tb.appendChild(clone);
+  });
+}).then(() => {
+  document.getElementById("root").remove();
+});
+</script>
+</html>
